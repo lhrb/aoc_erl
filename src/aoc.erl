@@ -35,7 +35,34 @@ shape(scissors) -> 3.
 outcome(X, X) -> 3;
 outcome(rock, scissors) -> 0;
 outcome(rock, paper) -> 6;
-outcome(scissors, rock) -> 0;
-outcome(scissors, paper) -> 6;
-outcome(paper, scissors) -> 0;
-outcome(paper, rock) -> 6.
+outcome(scissors, paper) -> 0;
+outcome(scissors, rock) -> 6;
+outcome(paper, rock) -> 0;
+outcome(paper, scissors) -> 6.
+
+calc(X, Y) -> shape(Y) + outcome(X, Y).
+round({X, Y}) -> calc(translate(X), translate(Y)).
+
+read2(Filename) ->
+    {ok, Bin} = file:read_file(Filename),
+    L = binary:split(Bin, <<"\n">>, [trim, global]),
+    L2 = lists:map(fun(B) -> string:tokens(binary_to_list(B), " ") end, L),
+    [list_to_tuple(X) || X <- L2].
+
+riddle3() ->
+    L = read2("input2"),
+    lists:sum(lists:map(fun round/1, L)).
+
+translate(X, "Y") -> translate(X);
+translate("A", "X") -> scissors;
+translate("A", "Z") -> paper;
+translate("B", "X") -> rock;
+translate("B", "Z") -> scissors;
+translate("C", "X") -> paper;
+translate("C", "Z") -> rock.
+
+strategy({X, Y}) -> calc(translate(X), translate(X, Y)).
+
+riddle4() ->
+    L = read2("input2"),
+    lists:sum(lists:map(fun strategy/1, L)).
