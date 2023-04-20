@@ -66,3 +66,29 @@ strategy({X, Y}) -> calc(translate(X), translate(X, Y)).
 riddle4() ->
     L = read2("input2"),
     lists:sum(lists:map(fun strategy/1, L)).
+
+% day 3
+str_to_list(Str) -> [[X] || X <- Str].
+
+find_item(Str) ->
+    L = str_to_list(Str),
+    Len = trunc(length(L)/2),
+    {A,B} = lists:split(Len, L),
+    I = sets:intersection(sets:from_list(A), sets:from_list(B)),
+    sets:to_list(I).
+
+generate_lookup_table() ->
+    L = lists:append(lists:seq(97, 122), lists:seq(65, 90)),
+    T = [{C, I} || {C, I} <- lists:zip(L, lists:seq(1, 52))],
+    maps:from_list(T).
+
+read3(Filename) ->
+    {ok, Bin} = file:read_file(Filename),
+    L = binary:split(Bin, <<"\n">>, [trim, global]),
+    lists:map(fun(S) -> binary_to_list(S) end, L).
+
+riddle5() ->
+    T = generate_lookup_table(),
+    R = read3("input3"),
+    Items = lists:map(fun find_item/1, R),
+    lists:sum(lists:map(fun([X]) -> maps:get(hd(X), T) end, Items)).
