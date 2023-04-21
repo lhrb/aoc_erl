@@ -92,3 +92,27 @@ riddle5() ->
     R = read3("input3"),
     Items = lists:map(fun find_item/1, R),
     lists:sum(lists:map(fun([X]) -> maps:get(hd(X), T) end, Items)).
+
+partitionImpl(N, Acc, Rest) when length(Rest) >= N ->
+    {H, R} = lists:split(N, Rest),
+    AccNext = lists:append(Acc, [H]),
+    partitionImpl(N, AccNext, R);
+partitionImpl(_, Acc, _) -> Acc.
+
+partition(N, List) -> partitionImpl(N, [], List).
+
+to_set(Str) -> sets:from_list(str_to_list(Str)).
+
+find_batch([A,B,C|[]]) ->
+    As = to_set(A),
+    Bs = to_set(B),
+    Cs = to_set(C),
+    AintersectB = sets:intersection(As, Bs),
+    sets:to_list(sets:intersection(AintersectB, Cs)).
+
+riddle6() ->
+    T = generate_lookup_table(),
+    R = read3("input3"),
+    Groups = partition(3, R),
+    Badges = lists:map(fun(X) -> find_batch(X) end, Groups),
+    lists:sum(lists:map(fun([X]) -> maps:get(hd(X), T) end, Badges)).
